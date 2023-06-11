@@ -36,6 +36,16 @@ namespace ShopKnitting
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    "node_modules"
+                )),
+                RequestPath = new PathString("/vendor")
+            });
+
             app.UseStaticFiles();
 
             app.UseRouting();
