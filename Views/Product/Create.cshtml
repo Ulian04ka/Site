@@ -27,12 +27,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="Year" class="control-label"></label>
-                <input asp-for="Year" class="form-control" />
+                <input asp-for="Year" class="form-control" min="1800" max="2023"/>
                 <span asp-validation-for="Year" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="CarBody" class="control-label"></label>
-                <select asp-for="CarBody" class="form-select" aria-label="Выбор типа кузова" 
+                <select asp-for="CarBody" class="form-select" aria-label="Выбор типа кузова"
                         asp-items="Html.GetEnumSelectList<ShopKnitting.Models.Auxiliary.CarBodyEnum>()">
                     @*<option selected>@CarBodyEnum.defaultCarBody.</option>*@
                 </select>
@@ -40,12 +40,16 @@
             </div>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control" rows="3" ></textarea>
+                <textarea asp-for="Description" class="form-control" rows="3" id="textareaDescription"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+            <script>
+                var textarea = document.getElementById("textareaDescription");
+                textarea.value = "Двигатель: ?; Мощность: ? л.с.; Коробка передач: ?; Привод: ?; Цвет: ?; Руль: ?";
+            </script>
             <div class="form-group">
                 <label asp-for="Cost" class="control-label"></label>
-                <input asp-for="Cost" class="form-control" />
+                <input asp-for="Cost" class="form-control" min="0" max="10000000000"/>
                 <span asp-validation-for="Cost" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -53,17 +57,48 @@
                 <input asp-for="CountInStack" class="form-control" />
                 <span asp-validation-for="CountInStack" class="text-danger"></span>
             </div>
-            <br/>
+            <div class="form-group">
+                <label for="productImage" class="form-label">@Html.DisplayNameFor(model => model.Images)</label>
+                <input class="form-control" name="upload" onchange="ValidateSingleInput(this);" type="file" id="productImages" required>
+            </div>
+            <br />
             <div class="form-group ">
                 <input type="submit" value="Создать" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
+<br />
 
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+<script>
+    var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".png"];
+    function ValidateSingleInput(fileInput) {
+        if (fileInput.type == "file") {
+            var fileInputValue = fileInput.value;
+            if (fileInputValue.length > 0) {
+                var fileInputValid = false;
+                for (var j = 0; j < _validFileExtensions.length; j++) {
+                    var fileInputExtension = _validFileExtensions[j];
+                    if (fileInputValue.substr(fileInputValue.length - fileInputExtension.length, fileInputExtension.length).toLowerCase()
+                        == fileInputExtension.toLowerCase()) {
+                        fileInputValid = true;
+                        break;
+                    }
+                }
+
+                if (!fileInputValid) {
+                    toastr.warning('К сожалению данный формат изображения не поддерживается!', 'Предупреждение');
+                    fileInput.value = "";
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+</script>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

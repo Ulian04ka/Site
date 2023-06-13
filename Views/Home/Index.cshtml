@@ -1,4 +1,5 @@
 ﻿@model ShopKnitting.Models.HelpModels.ProductListModel;
+@using System.ComponentModel.DataAnnotations;
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -7,38 +8,38 @@
     <div class="block-container d-flex justify-content-end">
         <div class="flex-left">
             @*@{
-            if (SignInManager.IsSignedIn(User) && @UserManager.GetUserAsync(User).Result.IsAdmin)
-            {
-                <a asp-controller="Product" asp-action="New" class="btn btn-outline-primary">
-                    <i class="bi bi-folder-plus"></i>
-                    Добавить товар
-                </a>
-            }
-        }*@
+                    if (SignInManager.IsSignedIn(User) && @UserManager.GetUserAsync(User).Result.IsAdmin)
+                    {
+                        <a asp-controller="Product" asp-action="New" class="btn btn-outline-primary">
+                            <i class="bi bi-folder-plus"></i>
+                            Добавить товар
+                        </a>
+                    }
+                }*@
             <a asp-controller="Product" asp-action="Create" class="btn btn-outline-primary">
                 <i class="bi bi-car-front"></i>
                 Добавить товар
             </a>
         </div>
-            <div class="flex-right">
-                @*<a class="btn btn-outline-primary" style="margin-right: 2.5px;"
+        <div class="flex-right">
+            @*<a class="btn btn-outline-primary" style="margin-right: 2.5px;"
                    onclick="showHideFilters();" id="openCloseFilterButton">
                     <i class="bi bi-funnel"></i>
                     Фильтры
                 </a>*@
-                <a asp-controller="Basket" asp-action="Index"
-                   class="btn btn-outline-primary position-relative" style="margin-left: 2.5px;">
-                    <i class="bi bi-basket"></i>
-                    Корзина
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-                          id="_totalProductCount" hidden="@ViewBag.TotalProductHidden">
-                        <span id="totalProductCount">@ViewBag.TotalProduct</span>
-                    </span>
-                </a>
-            </div>
+            <a asp-controller="Basket" asp-action="Index"
+               class="btn btn-outline-primary position-relative" style="margin-left: 2.5px;">
+                <i class="bi bi-basket"></i>
+                Корзина
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                      id="_totalProductCount" hidden="@ViewBag.TotalProductHidden">
+                    <span id="totalProductCount">@ViewBag.TotalProduct</span>
+                </span>
+            </a>
         </div>
+    </div>
 
-        @*<div class="block-container row" id="filters" onchange="validFilterParameters();" hidden="@ViewBag.filterHidden">
+    @*<div class="block-container row" id="filters" onchange="validFilterParameters();" hidden="@ViewBag.filterHidden">
             <div class="flex-left">
                 <h2 class="Inter-SemiBold">Фильтры:</h2>
             </div>
@@ -104,7 +105,7 @@
                 <div class="col-md-3 col-sm-4">
                     <div class="card in-card h-100">
                         @if (productModel.Images == null || productModel.Images.Path == "" ||
-                       !System.IO.File.Exists(ViewBag.WebRootPath + "/productImg/" + productModel.Images.Path))/* D:\Документы(D)\Студия проекты\ShopKnitting\wwwroot\productImg\Crown.jpg*/
+            !System.IO.File.Exists(ViewBag.WebRootPath + "/productImg/" + productModel.Images.Path))/* D:\Документы(D)\Студия проекты\ShopKnitting\wwwroot\productImg\Crown.jpg*/
                         {
                             <img src='@Url.Content("~/servicedata/")defaultNoPic.png' class="card-img-top"
                                  style="aspect-ratio: 1/1;" alt="...">
@@ -114,38 +115,34 @@
                             <img src='@Url.Content("~/productImg/")@productModel.Images.Path' class="card-img-top"
                                  style="aspect-ratio: 1/1;" alt="...">
                         }
-                        <div class="card-body">
-                            <h5 class="card-title">@productModel.Brand.Name @productModel.Model</h5>
-                            <p class="card-text fs-6">
-                                <label asp-for="@productModel.CarBody" class="control-label"/>
-                                <input type="text" asp-for="@productModel.CarBody" readonly class="form-control-plaintext" value="@productModel.CarBody"/>
-</p>
-                            <p class="card-text fs-6">
-                                <span class="text-strip">
-                                   Цена: @productModel.Cost₽
-                                </span>
-                     </p>
-                            <div class="flex-space-between">
-                                <a asp-action="Details" asp-controller="Product" asp-route-id="@productModel.Id"
-                                   role="button" class="btn btn-primary">
-                                    @*<i class="bi bi-eye"></i>*@
-                                    Посмотреть
-                                </a>
-                                <button class="btn btn-primary" onclick="addProductToBasket(@(JsonConvert.SerializeObject(productModel)));">
-                                    @*<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                                        <title>basket</title>
-                                        <path d="M22 9H17.21L12.83 2.44C12.64 2.16 12.32 2 12 2S11.36 2.16 11.17 2.45L6.79 9H2C1.45 9 1 9.45 1 10C1 10.09 1 10.18 1.04 10.27L3.58 19.54C3.81 20.38 4.58 21 5.5 21H18.5C19.42 21 20.19 20.38 20.43 19.54L22.97 10.27L23 10C23 9.45 22.55 9 22 9M12 4.8L14.8 9H9.2L12 4.8M18.5 19L5.5 19L3.31 11H20.7L18.5 19M12 13C10.9 13 10 13.9 10 15S10.9 17 12 17 14 16.1 14 15 13.1 13 12 13Z" />
-                                    </svg>*@
-                                    <i class="bi bi-cart4"></i>
-                                    @*<i class="bi bi-cart-plus"></i>*@
-                                    В корзину
-                                </button>
-                            </div>
+                    <div class="card-body">
+                        <h5 class="card-title">@productModel.Brand.Name @productModel.Model</h5>
+                        <label class="card-text flex-nowrap" style="white-space: nowrap;"><em>Тип кузова: @((productModel.CarBody.GetType().GetMember(@productModel.CarBody.ToString())[0].GetCustomAttributes(typeof(DisplayAttribute), false).FirstOrDefault() as DisplayAttribute)?.GetName())</em></label>
+                        <p class="card-text fs-5 ">
+                            <span class="text-strip">
+                                Цена: <strong>@productModel.Cost₽</strong>
+                        </span>
+                        </p>
+                        <div class="flex-space-between">
+                            <a asp-action="Details" asp-controller="Product" asp-route-id="@productModel.Id"
+                               role="button" class="btn btn-primary">
+                                @*<i class="bi bi-eye"></i>*@
+                                Посмотреть
+                            </a>
+                            <button class="btn btn-primary" onclick="addProductToBasket(@(JsonConvert.SerializeObject(productModel)));">
+                                @*<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <title>basket</title>
+                    <path d="M22 9H17.21L12.83 2.44C12.64 2.16 12.32 2 12 2S11.36 2.16 11.17 2.45L6.79 9H2C1.45 9 1 9.45 1 10C1 10.09 1 10.18 1.04 10.27L3.58 19.54C3.81 20.38 4.58 21 5.5 21H18.5C19.42 21 20.19 20.38 20.43 19.54L22.97 10.27L23 10C23 9.45 22.55 9 22 9M12 4.8L14.8 9H9.2L12 4.8M18.5 19L5.5 19L3.31 11H20.7L18.5 19M12 13C10.9 13 10 13.9 10 15S10.9 17 12 17 14 16.1 14 15 13.1 13 12 13Z" />
+                </svg>*@
+                                <i class="bi bi-cart4"></i>
+                                @*<i class="bi bi-cart-plus"></i>*@
+                                В корзину
+                            </button>
                         </div>
+                    </div>
                     </div>
                 </div>
             }
         </div>
     }
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>

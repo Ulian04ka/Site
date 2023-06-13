@@ -51,7 +51,6 @@ namespace ShopKnitting.Controllers
             ViewData["BrandId"] = new SelectList(_context.BrandModel, "Id", "Id");
 
             ViewData["Brand"] = new SelectList(_context.BrandModel, "Name", "Name");
-
             return View();
         }
 

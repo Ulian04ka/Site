@@ -41,7 +41,7 @@ namespace ShopKnitting.Controllers
             ProductListModel productListModel = new();
             productListModel.ProductList = _dbContext.ProductModels.Include(p => p.Brand).Include(c => c.Images);
             ViewData["WebRootPath"] = _webHostEnvironment.WebRootPath;
-            ViewData["TotalProduct"] =productListModel.ProductList.Count();
+            ViewData["TotalProduct"] =0;// вывести кол-во товаров в корзине
             
 
             return View(productListModel);
