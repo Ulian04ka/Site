@@ -90,7 +90,7 @@
             </div>
         </div>*@
     @using Newtonsoft.Json
-    @if (Model.productList.Count() == 0)
+    @if (Model.ProductList.Count() == 0)
     {
         <div class="alert alert-light" role="alert">
             В данный момент в магазине отсутствуют товары. Ждем вас позже ⌛
@@ -99,7 +99,7 @@
     else
     {
         <div class="block-container row">
-            @foreach (var productModel in Model.productList)
+            @foreach (var productModel in Model.ProductList)
             {
                 <div class="col-md-3 col-sm-4">
                     <div class="card in-card h-100">

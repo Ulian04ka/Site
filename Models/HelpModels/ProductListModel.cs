@@ -7,7 +7,7 @@ namespace ShopKnitting.Models.HelpModels
 {
     public class ProductListModel
     {
-        public readonly ProductModel productModel = new ProductModel();
-        public IEnumerable<ProductModel> productList { get; set; }
+        public readonly ProductModel productModel = new();
+        public IEnumerable<ProductModel> ProductList { get; set; }
     }
 }

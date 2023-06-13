@@ -38,10 +38,10 @@ namespace ShopKnitting.Controllers
             //_dbContext.ProductModels.Update(list);
             //_dbContext.SaveChanges();
             //CreateBrand();
-            ProductListModel productListModel = new ProductListModel();
-            productListModel.productList = _dbContext.ProductModels.Include(p => p.Brand).Include(c => c.Images);
+            ProductListModel productListModel = new();
+            productListModel.ProductList = _dbContext.ProductModels.Include(p => p.Brand).Include(c => c.Images);
             ViewData["WebRootPath"] = _webHostEnvironment.WebRootPath;
-            ViewData["TotalProduct"] =productListModel.productList.Count();
+            ViewData["TotalProduct"] =productListModel.ProductList.Count();
             
 
             return View(productListModel);
