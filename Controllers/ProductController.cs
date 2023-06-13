@@ -1,22 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShopKnitting.Models;
+using ShopKnitting.Models.DataModel;
 using ShopKnitting.Models.HelpModels;
+using Microsoft.Extensions.Logging;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using Newtonsoft.Json;
+using System.Collections;
+using Microsoft.AspNetCore.Identity;
 
 namespace ShopKnitting.Controllers
 {
     public class ProductController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(AppDbContext context)
+        const int ImageWidth = 1000;
+        const int ImageHeight = 1000;
+        public ProductController(AppDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Product
@@ -49,7 +63,6 @@ namespace ShopKnitting.Controllers
         public IActionResult Create()
         {
             ViewData["BrandId"] = new SelectList(_context.BrandModel, "Id", "Id");
-
             ViewData["Brand"] = new SelectList(_context.BrandModel, "Name", "Name");
             return View();
         }
@@ -58,16 +71,39 @@ namespace ShopKnitting.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,BrandId,Model,Year,CarBody,Description,Cost,CountInStack")] ProductModel productModel)
+        //public async Task<IActionResult> Create([Bind("Id,BrandId,Model,Year,CarBody,Description,Cost,CountInStack")] ProductModel productModel)
+        public async Task<IActionResult> Create(ProductModel productModel, IFormFile upload)
         {
+            productModel.Brand = _context.BrandModel.Where(c => c.Name == (string)Request.Form["Brand"]).FirstOrDefault();
+            productModel.BrandId = productModel.Brand.Id;
+            ImageModel imageModel = new();
+            if (upload != null)
+            {
+                string fileName = Path.GetFileName(upload.FileName);
+                string extFile = Path.GetExtension(fileName);
+                if (extFile.Contains(".png") || extFile.Contains(".jpg") ||
+                    extFile.Contains(".bmp"))
+                {
+                    var image = Image.Load(upload.OpenReadStream());
+                    image.Mutate(x => x.Resize(ImageWidth, ImageHeight));
+                    string imgGuid = Guid.NewGuid().ToString();
+                    string today = DateTime.Today.ToString("yyyy-MM-dd");
+                    fileName = today + "-" + imgGuid + extFile;
+
+                    string path = _webHostEnvironment.WebRootPath + "/productImg/" + fileName;
+                    image.Save(path);
+                    imageModel.Path = fileName;
+                }
+            }
             if (ModelState.IsValid)
             {
+                productModel.Images = imageModel;
                 _context.Add(productModel);
+                imageModel.ProductId = _context.ProductModels.Last().Id;
+                    _context.ImageModel.Add(imageModel);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["Brand"] = new SelectList(_context.BrandModel, "Name", "Name", productModel.Brand);
             return View(productModel);
         }
 
@@ -84,7 +120,8 @@ namespace ShopKnitting.Controllers
             {
                 return NotFound();
             }
-            ViewData["BrandId"] = new SelectList(_context.BrandModel, "Id", "Id", productModel.BrandId);
+            ViewData["BrandId"] = new SelectList(_context.BrandModel, "Id", "Id");
+            ViewData["Brand"] = new SelectList(_context.BrandModel, "Name", "Name");
             return View(productModel);
         }
 
@@ -93,17 +130,44 @@ namespace ShopKnitting.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,BrandId,Model,Year,CarBody,Description,Cost,CountInStack")] ProductModel productModel)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,BrandId,Model,Year,CarBody,Description,Cost,CountInStack")] ProductModel productModel, IFormFile upload)
         {
             if (id != productModel.Id)
             {
                 return NotFound();
             }
+            productModel.Brand = _context.BrandModel.Where(c => c.Name == (string)Request.Form["Brand"]).FirstOrDefault();
+            productModel.BrandId = productModel.Brand.Id;
+            ImageModel imageModel = new();
+            if (upload != null)
+            {
+                string fileName = Path.GetFileName(upload.FileName);
+                if (_context.ImageModel.Where(c => c.Path == fileName).Count() > 0)
+                {
+                    string extFile = Path.GetExtension(fileName);
+                    if (extFile.Contains(".png") || extFile.Contains(".jpg") ||
+                        extFile.Contains(".bmp"))
+                    {
+                        var image = Image.Load(upload.OpenReadStream());
+                        image.Mutate(x => x.Resize(ImageWidth, ImageHeight));
+                        string imgGuid = Guid.NewGuid().ToString();
+                        string today = DateTime.Today.ToString("yyyy-MM-dd");
+                        fileName = today + "-" + imgGuid + extFile;
 
+                        string path = _webHostEnvironment.WebRootPath + "/productImg/" + fileName;
+                        image.Save(path);
+                        imageModel.Path = fileName;
+                    }
+                }
+            }
             if (ModelState.IsValid)
             {
                 try
                 {
+                    productModel.Images = imageModel;
+                    _context.Add(productModel);
+                    imageModel.ProductId = _context.ProductModels.Last().Id;
+                    _context.ImageModel.Add(imageModel);
                     _context.Update(productModel);
                     await _context.SaveChangesAsync();
                 }
@@ -121,6 +185,7 @@ namespace ShopKnitting.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["BrandId"] = new SelectList(_context.BrandModel, "Id", "Id", productModel.BrandId);
+            ViewData["Brand"] = new SelectList(_context.BrandModel, "Name", "Name");
             return View(productModel);
         }
 

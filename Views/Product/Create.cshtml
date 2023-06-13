@@ -10,19 +10,18 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" enctype="multipart/form-data" method="post" class="needs-validation row g-3" novalidate>
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="BrandId" />
             <div class="form-group">
                 <label asp-for="Brand" class="control-label"></label>
                 <select asp-for="Brand" class="form-select" aria-label="Выбор марки автомобиля"
-                        asp-items="ViewBag.Brand">
+                        asp-items="ViewBag.Brand" id="Brand" required>
                 </select>
                 <span asp-validation-for="Brand" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Model" class="control-label"></label>
-                <input asp-for="Model" class="form-control" />
+                <input asp-for="Model" class="form-control" required/>
                 <span asp-validation-for="Model" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -33,7 +32,7 @@
             <div class="form-group">
                 <label asp-for="CarBody" class="control-label"></label>
                 <select asp-for="CarBody" class="form-select" aria-label="Выбор типа кузова"
-                        asp-items="Html.GetEnumSelectList<ShopKnitting.Models.Auxiliary.CarBodyEnum>()">
+                        asp-items="Html.GetEnumSelectList<ShopKnitting.Models.Auxiliary.CarBodyEnum>()" required>
                     @*<option selected>@CarBodyEnum.defaultCarBody.</option>*@
                 </select>
                 <span asp-validation-for="CarBody" class="text-danger"></span>
@@ -59,7 +58,7 @@
             </div>
             <div class="form-group">
                 <label for="productImage" class="form-label">@Html.DisplayNameFor(model => model.Images)</label>
-                <input class="form-control" name="upload" onchange="ValidateSingleInput(this);" type="file" id="productImages" required>
+                <input class="form-control" name="upload" onchange="ValidateSingleInput(this);" type="file" id="productImages" required asp-for="Images.Path">
             </div>
             <br />
             <div class="form-group ">
@@ -71,7 +70,7 @@
 <br />
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Перейти к списку автомобилей</a>
 </div>
 <script>
     var _validFileExtensions = [".jpg", ".jpeg", ".bmp", ".png"];
