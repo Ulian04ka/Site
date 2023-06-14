@@ -60,10 +60,6 @@
                 <label for="productImage" class="form-label">@Html.DisplayNameFor(model => model.Images)</label>
                 <input class="form-control" name="upload" onchange="ValidateSingleInput(this);" type="file" id="productImages" required asp-for="Images.Path">
             </div>
-            <script>
-                var textarea = document.getElementById("productImages");
-                textarea.value = @Model.Images.Path;
-            </script>
             <br />
             <div class="form-group">
                 <input type="submit" value="Сохранить" class="btn btn-primary" />
