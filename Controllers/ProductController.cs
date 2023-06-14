@@ -93,14 +93,17 @@ namespace ShopKnitting.Controllers
                     string path = _webHostEnvironment.WebRootPath + "\\productImg\\" + fileName;
                     image.Save(path);
                     imageModel.Path = fileName;
+                    _context.ImageModel.Add(imageModel);
+                await _context.SaveChangesAsync();
                 }
             }
             if (ModelState.IsValid)
             {
                 productModel.Images = imageModel;
                 _context.Add(productModel);
-                imageModel.ProductId = _context.ProductModels.Last().Id;
-                    _context.ImageModel.Add(imageModel);
+                await _context.SaveChangesAsync();
+                imageModel.ProductId =productModel.Id;
+                _context.ImageModel.Update(imageModel);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
@@ -169,7 +172,7 @@ namespace ShopKnitting.Controllers
                     if (ChangeImg)
                     {
                         productModel.Images = imageModel;
-                        imageModel.ProductId = _context.ProductModels.Last().Id;
+                        imageModel.ProductId = productModel.Id;
                         _context.ImageModel.Add(imageModel);
                     }
                     _context.Update(productModel);

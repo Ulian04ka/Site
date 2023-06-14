@@ -191,7 +191,7 @@ namespace ShopKnitting.Controllers
             }
 
             int product_id = int.Parse(response["product_id"].ToString());
-            ProductModel product = _context.ProductModels.FirstOrDefault(p => p.Id == product_id);
+            ProductModel product = _context.ProductModels.Include(p=>p.Brand).Include(p=>p.Images).FirstOrDefault(p => p.Id == product_id);
 
             //bool userIsSignedIn = _signInManager.IsSignedIn(User);
 
