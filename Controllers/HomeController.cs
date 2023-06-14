@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Grpc.Core;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -43,8 +44,7 @@ namespace ShopKnitting.Controllers
             ProductListModel productListModel = new();
             productListModel.ProductList = _dbContext.ProductModels.Include(p => p.Brand).Include(c => c.Images);
             ViewData["WebRootPath"] = _webHostEnvironment.WebRootPath;
-            ViewData["TotalProduct"] =_dbContext.BasketProductLinkModel.ToList().Count();// вывести кол-во товаров в корзине
-
+            //ViewData["TotalProduct"] =_dbContext.BasketProductLinkModel.ToList().Count();// вывести кол-во товаров в корзине
             return View(productListModel);
         }
         private void CreateBrand()

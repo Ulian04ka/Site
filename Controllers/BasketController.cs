@@ -55,7 +55,7 @@ namespace ShopKnitting.Controllers
 
                 foreach (var productKVP in basket)
                 {
-                    ProductModel product = _context.ProductModels.ToList().Find(p => p.Id == productKVP.Key);
+                    ProductModel product = _context.ProductModels.Include(p=> p.Brand).Include(p=>p.Images).ToList().Find(p => p.Id == productKVP.Key);
                     TotalCount += productKVP.Value;
                 }
 

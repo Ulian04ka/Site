@@ -111,20 +111,19 @@ namespace ShopKnitting.Controllers
         }
 
         // GET: Product/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public IActionResult Edit(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var productModel = await _context.ProductModels.FindAsync(id);
+            var productModel =  _context.ProductModels.Include(p=> p.Brand).Include(p=> p.Images).FirstOrDefault(c=> c.Id == id);
             if (productModel == null)
             {
                 return NotFound();
             }
-            ViewData["BrandId"] = new SelectList(_context.BrandModel, "Id", "Id");
-            ViewData["Brand"] = new SelectList(_context.BrandModel, "Name", "Name");
+            ViewData["Brand"] = new SelectList(_context.BrandModel, "Name", "Name", productModel.Brand);
             return View(productModel);
         }
 
