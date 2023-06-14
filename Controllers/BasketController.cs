@@ -23,10 +23,43 @@ namespace ShopKnitting.Controllers
         }
 
         // GET: Basket
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public IActionResult Index()
         {
-            var appDbContext = _context.BasketProductLinkModel.Include(b => b.Basket).Include(b => b.Product);
-            return View(await appDbContext.ToListAsync());
+            List<BasketProductLinkModel> basketProductLinks = new List<BasketProductLinkModel>();
+            List<ProductModel> products = _context.ProductModels.Include(p => p.Brand).Include(p=> p.Images).ToList();
+            Dictionary<ProductModel, int> basketFromCookie =
+                BasketHelper.GetBasketFromCookie(Request, Response)
+                    .ToDictionary(kvp => products.Find(x => x.Id == kvp.Key), kvp => kvp.Value);
+
+            Dictionary<ProductModel, int> actualBasket = new Dictionary<ProductModel, int>();
+            foreach (var product_kvp in basketFromCookie)
+            {
+                ProductModel productModel = _context.ProductModels.FirstOrDefault(p => p.Id == product_kvp.Key.Id);
+                if (productModel != null)
+                {
+                    basketProductLinks.Add(new BasketProductLinkModel(productModel, product_kvp.Value));
+                    actualBasket.Add(productModel, product_kvp.Value);
+                }
+            }
+
+            BasketHelper.RestructureBasket(actualBasket.ToDictionary(x => x.Key.Id, x => x.Value), Response, Request);
+            return View(basketProductLinks);
+        }
+        [HttpGet]
+        public int GetBasketProductCount()
+        {
+
+            int TotalCount = 0;
+                var basket = BasketHelper.GetBasketFromCookie(Request, Response);
+
+                foreach (var productKVP in basket)
+                {
+                    ProductModel product = _context.ProductModels.ToList().Find(p => p.Id == productKVP.Key);
+                    TotalCount += productKVP.Value;
+                }
+
+            return TotalCount;
         }
         [HttpPost]
         public bool RemoveItemFromBasket()
@@ -48,30 +81,13 @@ namespace ShopKnitting.Controllers
 
             int product_id = int.Parse(request["product_id"].ToString());
 
-           // bool userIsSignedIn = _signInManager.IsSignedIn(User);
 
             // BASKET: Remove product from basket
             try
             {
-                //if (!userIsSignedIn)
-                //{ // in cookies
                     BasketHelper.RemoveFromCookieBasket(product_id, Request, Response);
 
                     return true;
-                //}
-                //else
-                //{ // in db
-                //    UserModel user = _userManager.GetUserAsync(User).Result;
-
-                //    BasketModel basketModel = _context.Baskets.FirstOrDefault(b => b.UserId == user.Id);
-                //    BasketProductLinkModel basketProductLinkModel = _context.BasketProductLinks
-                //        .Where(b => b.BasketId == basketModel.Id)
-                //        .FirstOrDefault(p => p.ProductId == product_id);
-                //    _context.Remove(basketProductLinkModel);
-                //    _context.SaveChanges();
-
-                //    return true;
-                //}
             }
             catch
             {
@@ -85,11 +101,6 @@ namespace ShopKnitting.Controllers
 
             double TotalCost = 0;
 
-            //bool userIsSignedIn = _signInManager.IsSignedIn(User);
-
-            // BASKET: Get total sum of products
-            //if (!userIsSignedIn)
-            //{ // from cookies
                 var basket = BasketHelper.GetBasketFromCookie(Request, Response);
 
                 foreach (var productKVP in basket)
@@ -97,23 +108,6 @@ namespace ShopKnitting.Controllers
                     ProductModel product = _context.ProductModels.ToList().Find(p => p.Id == productKVP.Key);
                     TotalCost += product.Cost * productKVP.Value;
                 }
-            //}
-            //else
-            //{ // from db
-            //    UserModel user = _userManager.GetUserAsync(User).Result;
-
-            //    BasketModel basketModel = _context.Baskets.FirstOrDefault(b => b.UserId == user.Id);
-            //    if (basketModel == null)
-            //    {
-            //        basketModel = new BasketModel();
-            //        basketModel.User = user;
-            //        _context.Baskets.Add(basketModel);
-            //        _context.SaveChanges();
-            //    }
-
-            //    TotalCost = _context.BasketProductLinks.Where(b => b.BasketId == basketModel.Id)
-            //        .Sum(p => p.Product.Cost * p.CountCopies);
-            //}
 
             return TotalCost;
         }
@@ -140,31 +134,13 @@ namespace ShopKnitting.Controllers
             int product_id = int.Parse(request["product_id"].ToString());
             int product_count = int.Parse(request["product_count"].ToString());
 
-           // bool userIsSignedIn = _signInManager.IsSignedIn(User);
 
             // BASKET: Update count od product
             try
             {
-                //if (!userIsSignedIn)
-                //{ // in cookies
                     BasketHelper.UpdateCount(product_id, product_count, Response, Request);
 
                     return true;
-                //}
-                //else
-                //{ // in db
-                //    UserModel user = _userManager.GetUserAsync(User).Result;
-
-                //    BasketModel basketModel = _context.Baskets.FirstOrDefault(b => b.UserId == user.Id);
-                //    BasketProductLinkModel basketProductLinkModel = _context.BasketProductLinks
-                //        .Where(b => b.BasketId == basketModel.Id)
-                //        .FirstOrDefault(p => p.ProductId == product_id);
-                //    basketProductLinkModel.CountCopies = product_count;
-                //    _context.BasketProductLinks.Update(basketProductLinkModel);
-                //    _context.SaveChanges();
-
-                //    return true;
-                //}
             }
             catch
             {
@@ -193,52 +169,13 @@ namespace ShopKnitting.Controllers
             int product_id = int.Parse(response["product_id"].ToString());
             ProductModel product = _context.ProductModels.Include(p=>p.Brand).Include(p=>p.Images).FirstOrDefault(p => p.Id == product_id);
 
-            //bool userIsSignedIn = _signInManager.IsSignedIn(User);
 
             // BASKET: Add new product to basket
             try
             {
-                //if (!userIsSignedIn)
-                //{ // into cookies
                     BasketHelper.AddToCookieBasket(product, Request, Response);
 
                     return true;
-                //}
-                //else
-                //{ // into db
-                //    UserModel user = _userManager.GetUserAsync(User).Result;
-
-                //    BasketModel basketModel = _context.Baskets.FirstOrDefault(b => b.UserId == user.Id);
-
-                //    if (basketModel == null)
-                //    {
-                //        basketModel = new BasketModel();
-                //        basketModel.User = user;
-                //        _context.Baskets.Add(basketModel);
-                //        _context.SaveChanges();
-                //    }
-
-                //    BasketProductLinkModel basketProductLinkModel = _context.BasketProductLinks
-                //        .Where(b => b.BasketId == basketModel.Id).FirstOrDefault(b => b.ProductId == product_id);
-
-                //    if (basketProductLinkModel != null)
-                //    {
-                //        basketProductLinkModel.CountCopies += 1;
-                //        _context.BasketProductLinks.Update(basketProductLinkModel);
-                //        _context.SaveChanges();
-                //    }
-                //    else
-                //    {
-                //        basketProductLinkModel = new BasketProductLinkModel();
-                //        basketProductLinkModel.Basket = basketModel;
-                //        basketProductLinkModel.Product = product;
-                //        _context.BasketProductLinks.Add(basketProductLinkModel);
-                //        _context.SaveChanges();
-
-                //    }
-
-                //    return true;
-                //}
             }
             catch
             {
@@ -249,6 +186,16 @@ namespace ShopKnitting.Controllers
         private bool BasketProductLinkModelExists(int id)
         {
             return _context.BasketProductLinkModel.Any(e => e.BasketId == id);
+        }
+        [HttpGet]
+        public IActionResult Clear()
+        {            
+                BasketHelper.RestructureBasket(new Dictionary<int, int>(), Response, Request);
+           
+
+            ViewData["ProductCountInShop"] = _context.ProductModels.Count();
+
+            return RedirectToAction("Index", "Basket", new List<BasketProductLinkModel>());
         }
     }
 }

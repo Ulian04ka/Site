@@ -18,7 +18,7 @@ else
 
         </div>
         <div class="flex-right">
-            <a class="btn btn-outline-primary" style="margin-left: 2.5px;"
+            <a class="btn btn-outline-primary" 
                asp-controller="Basket" asp-action="Clear">
                 <i class="bi bi-cart-dash"></i>
                 Очистить корзину
@@ -30,13 +30,12 @@ else
     <div class="block-container row">
         <table class="table">
             <thead>
-                <tr style="color: #7f7f7f; font-size: .9375rem;">
-                    <th scope="col" colspan="2">
-
-                    </th>
+                <tr>
+                    <th scope="col"></th>
                     <th scope="col">Марка</th>
                     <th scope="col">Модель</th>
                     <th scope="col">Год выпуска</th>
+                    <th scope="col">Количество</th>
                     <th scope="col">Стоимость</th>
                     <th scope="col"></th>
                 </tr>
@@ -46,7 +45,7 @@ else
                 {
                     <tr style="text-align: left; vertical-align: middle;" class="Inter-Medium">
                         <td style="text-align: center;">
-                            <img src='@Url.Content("~/images/")@product.Product.Images.Path' class="img-circle"
+                            <img src='@Url.Content("~/productImg/")@product.Product.Images.Path' class="img-circle"
                                  width="64px" style="aspect-ratio: 1/1;" alt="...">
                         </td>
                         <td>
@@ -94,7 +93,7 @@ else
                         </span>
                     </div>
                     <div class="flex-right" @*style="min-width: 75%;"*@>
-                        <h2 @*class="Inter-Medium"*@>
+                        <h2 class="Inter-Medium">
                             <span id="totalCost">
                             </span>
                             &nbsp;₽

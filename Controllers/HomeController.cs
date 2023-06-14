@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ShopKnitting.Models;
 using ShopKnitting.Models.DataModel;
 using ShopKnitting.Models.HelpModels;
@@ -41,8 +43,7 @@ namespace ShopKnitting.Controllers
             ProductListModel productListModel = new();
             productListModel.ProductList = _dbContext.ProductModels.Include(p => p.Brand).Include(c => c.Images);
             ViewData["WebRootPath"] = _webHostEnvironment.WebRootPath;
-            ViewData["TotalProduct"] =0;// вывести кол-во товаров в корзине
-            
+            ViewData["TotalProduct"] =_dbContext.BasketProductLinkModel.ToList().Count();// вывести кол-во товаров в корзине
 
             return View(productListModel);
         }
@@ -80,5 +81,45 @@ namespace ShopKnitting.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+        public IActionResult Search(string searchString)
+        {
+            ProductListModel productListModel = new();
+            productListModel.ProductList = _dbContext.ProductModels.Include(p => p.Brand).Include(p => p.Images).Where(c => c.Brand.Name.Contains(searchString) || c.Model.Contains(searchString)).ToList();
+            ViewBag.RealiseFind = true;
+            ViewBag.RealiseFind = false;
+            ViewData["WebRootPath"] = _webHostEnvironment.WebRootPath;
+            ViewData["TotalProduct"] = _dbContext.BasketProductLinkModel.ToList().Count();
+            ViewBag.resultFound = "По вашему запросу \"" + searchString + "\" найдено " + productListModel.ProductList.Count() + " записей";
+            return View(productListModel);
+        }
     }
 }
+//Dictionary<string, object> response = new Dictionary<string, object>();
+
+//            MemoryStream stream = new MemoryStream();
+//            Request.Body.CopyTo(stream);
+//            stream.Position = 0;
+//            using (StreamReader reader = new StreamReader(stream))
+//            {
+//                string requestBody = reader.ReadToEnd();
+//                if (requestBody.Length > 0)
+//                {
+//                    response = JsonConvert.DeserializeObject<Dictionary<string, object>>(requestBody);
+//                }
+//            }
+
+//            int product_id = int.Parse(response["product_id"].ToString());
+//            ProductModel product = _dbContext.ProductModels.Include(p => p.Brand).Include(p => p.Images).FirstOrDefault(p => p.Id == product_id);
+
+
+//            // BASKET: Add new product to basket
+//            try
+//            {
+//                BasketHelper.AddToCookieBasket(product, Request, Response);
+
+//                return true;
+//            }
+//            catch
+//            {
+//                return false;
+//            }

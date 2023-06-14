@@ -1,9 +1,9 @@
 ﻿@model ShopKnitting.Models.HelpModels.ProductListModel;
 @using System.ComponentModel.DataAnnotations;
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Search";
 }
-    
+
 <div class="text-center">
     <div class="col-7 gap-4 flex-left">
         <form class="d-flex" asp-action="Search" asp-controller="Home" method="post">
@@ -15,12 +15,7 @@
     </div>
     <div class="block-container d-flex justify-content-end">
 
-        <div class="flex-left">
-            <a asp-controller="Product" asp-action="Create" class="btn btn-outline-primary">
-                <i class="bi bi-car-front"></i>
-                Добавить товар
-            </a>
-        </div>
+  
         <div class="flex-right">
             <a asp-controller="Basket" asp-action="Index"
                class="btn btn-outline-primary position-relative" style="margin-left: 2.5px;">
@@ -37,21 +32,17 @@
     <br />
 
     @using Newtonsoft.Json
-    @if (Model.ProductList.Count() == 0)
-    {
         <div class="alert alert-light" role="alert">
-            В данный момент в магазине отсутствуют товары. Ждем вас позже ⌛
+            @ViewBag.resultFound
         </div>
-    }
-    else
-    {
+    
         <div class="block-container row">
             @foreach (var productModel in Model.ProductList)
             {
                 <div class="col-md-3 col-sm-4">
                     <div class="card in-card h-100">
                         @if (productModel.Images == null || productModel.Images.Path == "" ||
-          !System.IO.File.Exists(ViewBag.WebRootPath + "/productImg/" + productModel.Images.Path))/* D:\Документы(D)\Студия проекты\ShopKnitting\wwwroot\productImg\Crown.jpg*/
+         !System.IO.File.Exists(ViewBag.WebRootPath + "/productImg/" + productModel.Images.Path))/* D:\Документы(D)\Студия проекты\ShopKnitting\wwwroot\productImg\Crown.jpg*/
                         {
                             <img src='@Url.Content("~/servicedata/")defaultNoPic.png' class="card-img-top"
                                  style="aspect-ratio: 1/1;" alt="...">
@@ -85,53 +76,51 @@
                 </div>
             }
         </div>
-    }
+    
 </div>
-    <script>
+<script>
+    window.onload = function () {
+        getBasketProductCount();
+    }
+    function addProductToBasket(product) {
+        axios.post('/Basket/AddProductToBasket', {
+            product_id: product.Id
+        });
+        getBasketProductCount();
+    }
 
-        window.onload = function () {
-            getBasketProductCount();
-        }
-        
-        function addProductToBasket(product) {
-            axios.post('/Basket/AddProductToBasket', {
-                product_id: product.Id
-            });
-            getBasketProductCount();
-        }
-
-        function checkHashAfterRedirect() {
-            var windowHash = window.location.hash;
-            if (windowHash === '#successDelete') {
-                toastr.success('Продукт был успешно удален.', 'Успех');
-            } else if (windowHash === '#errorDelete') {
-                toastr.error('При удалении произошла какая-то ошибка.', 'Ошибка');
-            }
-
-            removeHash();
+    function checkHashAfterRedirect() {
+        var windowHash = window.location.hash;
+        if (windowHash === '#successDelete') {
+            toastr.success('Продукт был успешно удален.', 'Успех');
+        } else if (windowHash === '#errorDelete') {
+            toastr.error('При удалении произошла какая-то ошибка.', 'Ошибка');
         }
 
-        function removeHash() {
-            history.pushState("", document.title, window.location.pathname + window.location.search);
-        }
+        removeHash();
+    }
 
-        async function getBasketProductCount() {
-            await axios.get('/Basket/GetBasketProductCount', {})
-                .then(function (response) {
-                    if (response.data) {
-                        if (document.getElementById("_totalProductCount").hidden) {
-                            document.getElementById("_totalProductCount").hidden = false;
-                        }
+    function removeHash() {
+        history.pushState("", document.title, window.location.pathname + window.location.search);
+    }
 
-                        document.getElementById("totalProductCount").textContent = response.data;
-                    } else {
-                        toastr.error('', 'Ошибка');
+    async function getBasketProductCount() {
+        await axios.get('/Basket/GetBasketProductCount', {})
+            .then(function (response) {
+                if (response.data) {
+                    if (document.getElementById("_totalProductCount").hidden) {
+                        document.getElementById("_totalProductCount").hidden = false;
                     }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
-        }
+
+                    document.getElementById("totalProductCount").textContent = response.data;
+                } else {
+                    toastr.error('', 'Ошибка');
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
 
 
-    </script>
+</script>
