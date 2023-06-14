@@ -31,10 +31,3 @@ jobs:
           push: true
           tags: |
             timatet/ulsite:latest
-      - 
-        name: Docker Hub Description
-        uses: peter-evans/dockerhub-description@v3
-        with:
-          username: timatet
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: timatet/ulsite
