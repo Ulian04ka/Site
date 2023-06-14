@@ -105,14 +105,14 @@
                 <div class="col-md-3 col-sm-4">
                     <div class="card in-card h-100">
                         @if (productModel.Images == null || productModel.Images.Path == "" ||
-            !System.IO.File.Exists(ViewBag.WebRootPath + "/productImg/" + productModel.Images.Path))/* D:\Документы(D)\Студия проекты\ShopKnitting\wwwroot\productImg\Crown.jpg*/
+            !System.IO.File.Exists(ViewBag.WebRootPath + "/productImg11/" + productModel.Images.Path))/* D:\Документы(D)\Студия проекты\ShopKnitting\wwwroot\productImg1\Crown.jpg*/
                         {
                             <img src='@Url.Content("~/servicedata/")defaultNoPic.png' class="card-img-top"
                                  style="aspect-ratio: 1/1;" alt="...">
                         }
                         else
                         {
-                            <img src='@Url.Content("~/productImg/")@productModel.Images.Path' class="card-img-top"
+                            <img src='@Url.Content("~/productImg1/")@productModel.Images.Path' class="card-img-top"
                                  style="aspect-ratio: 1/1;" alt="...">
                         }
                     <div class="card-body">
