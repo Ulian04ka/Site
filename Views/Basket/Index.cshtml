@@ -1,35 +1,213 @@
-﻿@model IEnumerable<ShopKnitting.Models.DataModel.BasketModel>
-
+﻿@model IEnumerable<ShopKnitting.Models.DataModel.BasketProductLinkModel>
+@using Newtonsoft.Json
 @{
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.User)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+<h1>Корзина</h1>
+@if (Model.Count() == 0)
+{
+    <div class="alert alert-primary" role="alert">
+        Вы еще не добавили ни одного товара в корзину.
+    </div>
 }
-    </tbody>
-</table>
+else
+{
+    <div class="block-container flex-space-between">
+        <div class="flex-left">
+
+        </div>
+        <div class="flex-right">
+            <a class="btn btn-outline-primary" style="margin-left: 2.5px;"
+               asp-controller="Basket" asp-action="Clear">
+                <i class="bi bi-cart-dash"></i>
+                Очистить корзину
+            </a>
+        </div>
+    </div>
+
+
+    <div class="block-container row">
+        <table class="table">
+            <thead>
+                <tr style="color: #7f7f7f; font-size: .9375rem;">
+                    <th scope="col" colspan="2">
+
+                    </th>
+                    <th scope="col">Марка</th>
+                    <th scope="col">Модель</th>
+                    <th scope="col">Год выпуска</th>
+                    <th scope="col">Стоимость</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Model)
+                {
+                    <tr style="text-align: left; vertical-align: middle;" class="Inter-Medium">
+                        <td style="text-align: center;">
+                            <img src='@Url.Content("~/images/")@product.Product.Images.Path' class="img-circle"
+                                 width="64px" style="aspect-ratio: 1/1;" alt="...">
+                        </td>
+                        <td>
+                            @product.Product.Brand.Name
+                        </td>
+                        <td>
+                            @product.Product.Model
+                        </td>
+                        <td>
+                            @product.Product.Year
+                        </td>
+                        <td>
+                            <input class="input-custom" type="number"
+                                   value="@product.CountCopies" step="1" min="1" max="100"
+                                   onkeypress="return isNumberKey(event)"
+                                   onchange="changeCount(event, @JsonConvert.SerializeObject(product.Product))" />
+                        </td>
+                        <td style="font-size: large;">
+                            <span id="productCost-@product.Product.Id">@GetCost(@product.Product.Cost, @product.CountCopies)</span>  ₽
+                        </td>
+                        <td>
+                            <a type="button" onclick="removeItemFromBasket(@JsonConvert.SerializeObject(product.Product));">
+                                <svg data-v-4f20fabd="" height="22px" viewBox="0 0 26 26" width="22px" xmlns="http://www.w3.org/2000/svg">
+                                    <g data-v-4f20fabd="" fill="none" fill-rule="evenodd" stroke="#d2d2d2" stroke-linecap="square" stroke-width="3">
+                                        <path data-v-4f20fabd="" d="M2.874 2.973l20.59 20.59M22.874 2.973L2.676 23.563" />
+                                    </g>
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="block-container">
+        <div class="flex-space-between" style="margin-bottom: 10px; margin-top: 10px;">
+            <div class="flex-left">
+
+            </div>
+            <div class="flex-right">
+                <div class="flex-space-between" style="width: 350px;">
+                    <div class="flex-left">
+                        <span class="Inter-Regular">
+                            К оплате
+                        </span>
+                    </div>
+                    <div class="flex-right" style="min-width: 75%;">
+                        <h2 class="Inter-Medium">
+                            <span id="totalCost">
+                            </span>
+                            &nbsp;₽
+                        </h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex-space-between">
+            <div class="flex-left">
+
+            </div>
+            <div class="flex-right">
+                <form method="post" asp-controller="Order" asp-action="Creation">
+                    <input type="hidden" name="orderList" id="orderList" />
+                    <button type="submit" class="btn btn-primary btn-lg" style="margin-left: 2.5px;">
+                        <i class="bi bi-cash-coin"></i>
+                        Оформить покупку
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+@functions {public string GetCost(double cost, int count)
+    {
+        return (cost * count).ToString();
+    }
+}
+    <script>
+
+    plain_order_products = []
+    function markProduct(element, product_link_id, product_link_copies) {
+        if (element.checked) {
+            plain_order_products.push([product_link_id, product_link_copies]);
+        } else {
+            var index = plain_order_products.findIndex(e => e[0] === product_link_id)
+            if (index > -1) {
+                plain_order_products.splice(index, 1);
+            }
+        }
+
+        document.getElementById('orderList').value = JSON.stringify(plain_order_products);
+    }
+
+    function removeItemFromBasket(product) {
+        axios.post('/Basket/RemoveItemFromBasket', {
+            product_id: product.Id
+        })
+            .then(function (response) {
+                if (response.data == true) {
+                    window.location.reload();
+                } else {
+                    toastr.error('', 'Ошибка');
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    window.onload = function () {
+        changeTotalCost();
+    };
+
+    function changeTotalCost() {
+        axios.get('/Basket/GetBasketTotalCost', {})
+            .then(function (response) {
+                if (response.data || response.data == 0) {
+                    document.getElementById("totalCost").textContent = response.data;
+                } else {
+                    toastr.error('', 'Ошибка');
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+    }
+
+    async function changeCount(e, product) {
+
+        if (e.target.value == '' || parseInt(e.target.value, 10) == 0) {
+            e.target.value = 1
+        } else if (parseInt(e.target.value, 10) > parseInt(e.target.max, 10)) {
+            e.target.value = e.target.max
+        }
+
+        await axios.post('/Basket/ChangeProductCount', {
+            product_id: product.Id,
+            product_count: e.target.value
+        })
+            .then(function (response) {
+                if (response.data == true) {
+                    document.getElementById("productCost-" + product.Id).textContent = e.target.value * product.Cost;
+                } else {
+                    //console.log(response)
+                    toastr.error('', 'Ошибка');
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
+        await changeTotalCost();
+
+    }
+
+    function isNumberKey(e) {
+        var charCode = (e.which) ? e.which : e.keyCode
+        if (charCode > 31 && (charCode < 48 || charCode > 57))
+            return false;
+        return true;
+    }
+
+    </script>

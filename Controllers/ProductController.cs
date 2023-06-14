@@ -47,9 +47,9 @@ namespace ShopKnitting.Controllers
             {
                 return NotFound();
             }
-
+            ViewData["WebRootPath"] = _webHostEnvironment.WebRootPath;
             var productModel = await _context.ProductModels
-                .Include(p => p.Brand)
+                .Include(p => p.Brand).Include(p=>p.Images)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (productModel == null)
             {
@@ -138,11 +138,12 @@ namespace ShopKnitting.Controllers
             }
             productModel.Brand = _context.BrandModel.Where(c => c.Name == (string)Request.Form["Brand"]).FirstOrDefault();
             productModel.BrandId = productModel.Brand.Id;
+            bool ChangeImg = true;
             ImageModel imageModel = new();
             if (upload != null)
             {
                 string fileName = Path.GetFileName(upload.FileName);
-                if (_context.ImageModel.Where(c => c.Path == fileName).Count() > 0)
+                if (productModel.Images.Path != fileName)
                 {
                     string extFile = Path.GetExtension(fileName);
                     if (extFile.Contains(".png") || extFile.Contains(".jpg") ||
@@ -159,15 +160,18 @@ namespace ShopKnitting.Controllers
                         imageModel.Path = fileName;
                     }
                 }
+                else ChangeImg = false;
             }
             if (ModelState.IsValid)
             {
                 try
                 {
-                    productModel.Images = imageModel;
-                    _context.Add(productModel);
-                    imageModel.ProductId = _context.ProductModels.Last().Id;
-                    _context.ImageModel.Add(imageModel);
+                    if (ChangeImg)
+                    {
+                        productModel.Images = imageModel;
+                        imageModel.ProductId = _context.ProductModels.Last().Id;
+                        _context.ImageModel.Add(imageModel);
+                    }
                     _context.Update(productModel);
                     await _context.SaveChangesAsync();
                 }
