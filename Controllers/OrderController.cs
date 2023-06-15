@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ShopKnitting.Models.DataModel;
 using ShopKnitting.Models.HelpModels;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 
 namespace ShopKnitting.Controllers
 {
@@ -70,7 +73,23 @@ namespace ShopKnitting.Controllers
             }
             return View(orderModel);
         }
+        //public void addPic()
+        //{
 
+        //    string fileName = @"D:\Документы (D)\Студия проекты\ShopKnitting\wwwroot\servicedata\car_setting.png";
+        //    string extFile = Path.GetExtension(fileName);
+        //    if (extFile.Contains(".png") || extFile.Contains(".jpg") ||
+        //        extFile.Contains(".bmp"))
+        //    {
+        //        var image = Image.Load(upload.OpenReadStream());
+        //        image.Mutate(x => x.Resize(ImageWidth, ImageHeight));
+        //        string imgGuid = Guid.NewGuid().ToString();
+        //        string today = DateTime.Today.ToString("yyyy-MM-dd");
+        //        fileName = today + "-" + imgGuid + extFile;
+
+        //        string path = _webHostEnvironment.WebRootPath + "/productImg/" + fileName;
+        //    }
+        //}
         // GET: Order/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
