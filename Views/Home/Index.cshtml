@@ -89,30 +89,31 @@
 </div>
     <script>
 
-        //window.onload = function () {
-        //    getBasketProductCount();
-        //}
-        
-        function addProductToBasket(product) {
-            axios.post('/Basket/AddProductToBasket', {
-                product_id: product.Id
-            });
-            getBasketProductCount();
-        }
-
         function checkHashAfterRedirect() {
             var windowHash = window.location.hash;
-            if (windowHash === '#successDelete') {
-                toastr.success('Продукт был успешно удален.', 'Успех');
-            } else if (windowHash === '#errorDelete') {
-                toastr.error('При удалении произошла какая-то ошибка.', 'Ошибка');
-            }
+            //if (windowHash === '#successDelete') {
+            //    toastr.success('Продукт был успешно удален.', 'Успех');
+            //} else if (windowHash === '#errorDelete') {
+            //    toastr.error('При удалении произошла какая-то ошибка.', 'Ошибка');
+            //}
 
             removeHash();
         }
 
         function removeHash() {
             history.pushState("", document.title, window.location.pathname + window.location.search);
+        }
+        
+        function addProductToBasket(product) {
+            axios.post('/Basket/AddProductToBasket', {
+                product_id: product.Id
+            })
+                .then(function (response) {
+                    if (response.data == true) {
+                        //toastr.success('Продукт был добавлен в корзину.', 'Успех');
+                        getBasketProductCount();
+                    }
+                });
         }
 
         async function getBasketProductCount() {
@@ -125,7 +126,7 @@
 
                         document.getElementById("totalProductCount").textContent = response.data;
                     } else {
-                        toastr.error('', 'Ошибка');
+                        //toastr.error('', 'Ошибка');
                     }
                 })
                 .catch(function (error) {
