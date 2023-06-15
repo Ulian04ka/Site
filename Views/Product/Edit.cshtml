@@ -14,7 +14,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Brand" class="control-label"></label>
-                <select asp-for="Brand" class="form-select" aria-label="Выбор марки автомобиля"
+                <select asp-for="Brand.Name" class="form-select" aria-label="Выбор марки автомобиля"
                         asp-items="ViewBag.Brand" id="Brand" required>
                 </select>
                 <span asp-validation-for="Brand" class="text-danger"></span>
@@ -58,17 +58,21 @@
             </div>
             <div class="form-group">
                 <label for="productImage" class="form-label">@Html.DisplayNameFor(model => model.Images)</label>
-                <input class="form-control" name="upload" onchange="ValidateSingleInput(this);" type="file" id="productImages" required asp-for="Images.Path">
+                <input class="form-control" name="upload" onchange="ValidateSingleInput(this);" type="file" id="productImages" required>
             </div>
-            <script>
-                var textarea = document.getElementById("productImages");
-                textarea.value = @Model.Images.Path;
-            </script>
-            <br />
-            <div class="form-group">
-                <input type="submit" value="Сохранить" class="btn btn-primary" />
-            </div>
-        </form>
+            @if (Model.Images != null)
+            {
+        <div class="form-group">
+            <label class="form-label">Текущее изображение</label>
+            <img src='@Url.Content("~/productImg/")@Model.Images.Path' class="img-circle"
+                 width="64px" style="aspect-ratio: 1/1;" alt="...">
+        </div>
+            }
+                    <br />
+                    <div class="form-group">
+                        <input type="submit" value="Сохранить" class="btn btn-primary" />
+                    </div>
+            </form>
     </div>
 </div>
 

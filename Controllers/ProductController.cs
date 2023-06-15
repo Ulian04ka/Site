@@ -123,7 +123,10 @@ namespace ShopKnitting.Controllers
             {
                 return NotFound();
             }
-            ViewData["Brand"] = new SelectList(_context.BrandModel, "Name", "Name", productModel.Brand);
+            var selectlist = new SelectList(_context.BrandModel, "Name", "Name");
+            var selected = selectlist.Where(x => x.Value == productModel.Brand.Name).First();
+            selected.Selected = true;
+            ViewData["Brand"] = selectlist;
             return View(productModel);
         }
 
@@ -138,14 +141,14 @@ namespace ShopKnitting.Controllers
             {
                 return NotFound();
             }
-            productModel.Brand = _context.BrandModel.Where(c => c.Name == (string)Request.Form["Brand"]).FirstOrDefault();
+            productModel.Brand = _context.BrandModel.Where(c => c.Name == (string)Request.Form["Brand.Name"]).FirstOrDefault();
             productModel.BrandId = productModel.Brand.Id;
             bool ChangeImg = true;
             ImageModel imageModel = new();
             if (upload != null)
             {
                 string fileName = Path.GetFileName(upload.FileName);
-                if (productModel.Images.Path != fileName)
+                if (productModel.Images==null || productModel.Images.Path != fileName)
                 {
                     string extFile = Path.GetExtension(fileName);
                     if (extFile.Contains(".png") || extFile.Contains(".jpg") ||
@@ -164,6 +167,7 @@ namespace ShopKnitting.Controllers
                 }
                 else ChangeImg = false;
             }
+                else ChangeImg = false;
             if (ModelState.IsValid)
             {
                 try
