@@ -44,8 +44,23 @@ namespace ShopKnitting.Controllers
             ProductListModel productListModel = new();
             productListModel.ProductList = _dbContext.ProductModels.Include(p => p.Brand).Include(c => c.Images);
             ViewData["WebRootPath"] = _webHostEnvironment.WebRootPath;
-            //ViewData["TotalProduct"] =_dbContext.BasketProductLinkModel.ToList().Count();// вывести кол-во товаров в корзине
+            ViewData["TotalProduct"] = GetBasketProductCount();// вывести кол-во товаров в корзине
             return View(productListModel);
+        }
+        [HttpGet]
+        public int GetBasketProductCount()
+        {
+
+            int TotalCount = 0;
+            var basket = BasketHelper.GetBasketFromCookie(Request, Response);
+
+            foreach (var productKVP in basket)
+            {
+                ProductModel product = _dbContext.ProductModels.Include(p => p.Brand).Include(p => p.Images).ToList().Find(p => p.Id == productKVP.Key);
+                TotalCount += productKVP.Value;
+            }
+
+            return TotalCount;
         }
         private void CreateBrand()
         {

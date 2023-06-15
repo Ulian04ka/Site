@@ -12,8 +12,8 @@
     <div class="block-container row">
         <div class="row flex-space-between">
             <div class="col rect-img-container flex-left" style="margin-right: 20px;">
-                @if (Model.Images == null || Model.Images.Path == "" ||
-            !System.IO.File.Exists(ViewBag.WebRootPath + "/productImg/" + Model.Images.Path))/* D:\Документы(D)\Студия проекты\ShopKnitting\wwwroot\productImg\Crown.jpg*/
+                @if (Model.Images == null || Model.Images.Path == "" @*||
+            !System.IO.File.Exists(ViewBag.WebRootPath + "/productImg/" + Model.Images.Path)*@)/* D:\Документы(D)\Студия проекты\ShopKnitting\wwwroot\productImg\Crown.jpg*/
                 {
                     <img src='@Url.Content("~/servicedata/")defaultNoPic.png' class="rect-img img-border-circle img-shadow" 
                          style="padding: 10px; max-height:600px;" alt="...">
