@@ -90,7 +90,7 @@ namespace ShopKnitting.Controllers
                     string today = DateTime.Today.ToString("yyyy-MM-dd");
                     fileName = today + "-" + imgGuid + extFile;
 
-                    string path = _webHostEnvironment.WebRootPath + "/servicedata/" + fileName;
+                    string path = _webHostEnvironment.WebRootPath + "/productImg/" + fileName;
                     image.Save(path);
                     imageModel.Path = fileName;
                     _context.ImageModel.Add(imageModel);
@@ -157,7 +157,7 @@ namespace ShopKnitting.Controllers
                         string today = DateTime.Today.ToString("yyyy-MM-dd");
                         fileName = today + "-" + imgGuid + extFile;
 
-                        string path = _webHostEnvironment.WebRootPath + "/servicedata/" + fileName;
+                        string path = _webHostEnvironment.WebRootPath + "/productImg/" + fileName;
                         image.Save(path);
                         imageModel.Path = fileName;
                     }
